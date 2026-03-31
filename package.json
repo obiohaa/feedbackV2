@@ -1,0 +1,40 @@
+{
+  "name": "feedback-v2",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "proxy": "http://localhost:5000/api/v1",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@react-pdf/renderer": "^4.3.2",
+    "@tanstack/react-query": "^5.95.2",
+    "axios": "^1.13.6",
+    "file-saver": "^2.0.5",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-hook-form": "^7.72.0",
+    "react-icons": "^5.6.0",
+    "react-paginate": "^8.3.0",
+    "react-phone-number-input": "^3.4.16",
+    "react-router-dom": "^7.13.2",
+    "react-select": "^5.10.2",
+    "react-toastify": "^11.0.5",
+    "styled-components": "^6.3.12"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.4",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "eslint": "^9.39.4",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.5.2",
+    "globals": "^17.4.0",
+    "vite": "^8.0.3"
+  }
+}
