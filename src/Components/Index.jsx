@@ -1,12 +1,9 @@
 import React from "react";
-import "./component.css";
-import CustomerFeedback from "./FeedbackForm";
-import { ToastContainer } from "react-toastify";
+import CustomerFeedback from "./Main/FeedbackForm";
 
 const Index = () => {
   return (
     <div>
-      <ToastContainer />
       <CustomerFeedback />
     </div>
   );

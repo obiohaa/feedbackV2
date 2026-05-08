@@ -8,11 +8,12 @@ import "react-phone-number-input/style.css";
 import StarRating from "./StarRating";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import { AxiosFetch } from "../Utility/AxiosFetch";
-import Loading from "../Components/Checks/Loading";
-import CheckMark from "../Components/Checks/GoodCheck";
+import { AxiosFetch } from "../../Utility/AxiosFetch";
+import Loading from "../Checks/Loading";
+import CheckMark from "../Checks/GoodCheck";
 import Select from "react-select";
-import customStyles from "./CustomStyle";
+import PhoneNumbers from "./PhoneNumbers";
+// import customStyles from "./CustomStyle";
 
 // import { Link, useNavigate } from "react-router-dom";
 
@@ -26,9 +27,10 @@ import customStyles from "./CustomStyle";
 
 export default function CustomerFeedback() {
   // const navigate = useNavigate();
-  const [food, setFood] = useState(0);
-  const [service, setService] = useState(0);
-  const [ambiance, setAmbiance] = useState(0);
+  // const [food, setFood] = useState(0);
+  // const [service, setService] = useState(0);
+  // const [ambiance, setAmbiance] = useState(0);
+  const [general_service, setGeneral_service] = useState(0);
   const [showCheck, setShowCheck] = useState(false);
 
   const {
@@ -41,7 +43,7 @@ export default function CustomerFeedback() {
     defaultValues: {
       name: "",
       phone: "",
-      location: "",
+      // location: "",
       comment: "",
     },
     // shouldUnregister: true,
@@ -53,18 +55,20 @@ export default function CustomerFeedback() {
   const { mutate: logUser, isPending } = useMutation({
     mutationFn: async (logUser) => AxiosFetch.post("/sendFeedback", { ...logUser }),
     onSuccess: (data) => {
-      console.log(data);
+      reset();
+      setGeneral_service(0);
       setShowCheck(true);
     },
     onError: (error) => {
       reset();
-      setFood(0);
-      setService(0);
-      setAmbiance(0);
+      // setFood(0);
+      // setService(0);
+      // setAmbiance(0);
+      setGeneral_service(0);
 
       // REMOVE THIS AFTER TESTING
       setShowCheck(true);
-      console.log(error);
+      // console.log(error);
 
       // toast.error(
       //   <div>
@@ -89,7 +93,7 @@ export default function CustomerFeedback() {
     if (
       !data.name?.trim() ||
       !data.comment?.trim() ||
-      !data.location?.trim() ||
+      // !data.location?.trim() ||
       !data.phone?.trim()
     ) {
       toast.error(
@@ -117,24 +121,26 @@ export default function CustomerFeedback() {
     const payload = {
       ...data,
       ratings: {
-        food,
-        service,
-        ambiance,
+        // food,
+        // service,
+        // ambiance,
+        general_service,
       },
     };
-    // console.log(payload);
+    console.log(payload);
 
     logUser(payload);
-    setFood(0);
-    setService(0);
-    setAmbiance(0);
+    // setFood(0);
+    // setService(0);
+    // setAmbiance(0);
+    setGeneral_service(0);
   };
 
   //GET LOCATION RECORD
   const {
     isLoading: LoadingLocation,
-    error,
-    data,
+    // data,
+    //  error,
   } = useQuery({
     queryKey: ["locationData"],
     retryOnMount: true, //do not retry on mount
@@ -152,33 +158,32 @@ export default function CustomerFeedback() {
     },
   });
 
-  // console.log(data.AllOutletLocations);
+  //IF NOT TAKES OUT THE ERRORS POPPING UP IS NOT A GOOD UX FOR LOCATION UNAVAILABILITY, BETTER TO HAVE THE LOCATION FIELD SHOW LOADING OR UNAVAILABLE THAN AN ERROR TOAST
+  // if (error) {
+  //   toast.error(
+  //     <div>
+  //       <span>
+  //         {error.response ? error.response.data.msg : "Something went wrong contact Admin"}
+  //       </span>
+  //     </div>,
+  //     {
+  //       position: "top-center",
+  //       autoClose: 8000,
+  //       hideProgressBar: true,
+  //       closeOnClick: false,
+  //       pauseOnHover: true,
+  //       draggable: true,
+  //       progress: undefined,
+  //       className: "toastBad",
+  //     },
+  //   );
+  // }
 
-  if (error) {
-    toast.error(
-      <div>
-        <span>
-          {error.response ? error.response.data.msg : "Something went wrong contact Admin"}
-        </span>
-      </div>,
-      {
-        position: "top-center",
-        autoClose: 8000,
-        hideProgressBar: true,
-        closeOnClick: false,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        className: "toastBad",
-      },
-    );
-  }
-
-  const outletOptions =
-    data?.AllOutletLocations?.map((OutletLocation) => ({
-      value: OutletLocation.OutletName, // clean value
-      label: `Theplace ${OutletLocation.OutletName}`, // display
-    })) || [];
+  // const outletOptions =
+  //   data?.AllOutletLocations?.map((OutletLocation) => ({
+  //     value: OutletLocation.OutletName, // clean value
+  //     label: `Theplace ${OutletLocation.OutletName}`, // display
+  //   })) || [];
 
   return (
     <div>
@@ -196,9 +201,15 @@ export default function CustomerFeedback() {
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} autoComplete="off" noValidate>
-              {/* <StarRating label="Food Quality" rating={food} setRating={setFood} />
+              <StarRating
+                label="General Service"
+                rating={general_service}
+                setRating={setGeneral_service}
+              />
 
-              <StarRating label="Customer Service" rating={service} setRating={setService} />
+              {/* <StarRating label="General Service" rating={food} setRating={setFood} /> */}
+
+              {/* <StarRating label="Customer Service" rating={service} setRating={setService} />
 
               <StarRating label="Ambiance" rating={ambiance} setRating={setAmbiance} /> */}
 
@@ -210,7 +221,7 @@ export default function CustomerFeedback() {
                   {...register("name", {
                     validate: (value) => (value && value.trim() !== "") || "Name is required",
 
-                    required: "Name is required",
+                    required: "Name is required!",
                     minLength: {
                       value: 2,
                       message: "Minimum characters of 2 letters.",
@@ -271,7 +282,7 @@ export default function CustomerFeedback() {
                 {errors.phone && <span className="error">{errors.phone.message}</span>}
               </div>
 
-              <div className="form-group">
+              {/* <div className="form-group">
                 <label>Outlet Locations</label>
                 <Controller
                   name="location"
@@ -296,7 +307,7 @@ export default function CustomerFeedback() {
                   )}
                 />
                 {errors.location && <span className="error">{errors.location.message}</span>}
-              </div>
+              </div> */}
               {/* COMMENT */}
               <div className="form-group">
                 <label>Comments</label>
@@ -307,7 +318,7 @@ export default function CustomerFeedback() {
                   {...register("comment", {
                     validate: (value) =>
                       (value && value.trim().length >= 10) || "Minimum 10 characters",
-                    required: "Comments required",
+                    required: "Comments required!",
                     minLength: {
                       value: 10,
                       message: "Response must be at least 10 characters",
@@ -326,6 +337,7 @@ export default function CustomerFeedback() {
                 {isPending ? <Loading /> : "Submit Feedback"}
               </button>
             </form>
+            <span className="callNumber"><PhoneNumbers /></span>
           </div>
         </div>
         {showCheck && (
@@ -339,6 +351,7 @@ export default function CustomerFeedback() {
           <img src={foodImage} alt="Food" className="feedbackImage" loading="lazy" />
         </div>
       </div>
+      
     </div>
   );
 }

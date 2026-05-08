@@ -1,20 +1,17 @@
 // import React, { useState } from "react";
-import "./component.css";
+import "./setup.css";
 import logo from "/theplace.png";
 import { useForm, Controller } from "react-hook-form";
-import PhoneInput from "react-phone-number-input";
-import "react-phone-number-input/style.css";
-import StarRating from "./StarRating";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
-import { AxiosFetch } from "../Utility/AxiosFetch";
-import Loading from "../Components/Checks/Loading";
-import CheckMark from "../Components/Checks/GoodCheck";
+import { AxiosFetch } from "../../Utility/AxiosFetch";
+import Loading from "../../Components/Checks/Loading";
 import Select from "react-select";
-import customStyles from "./CustomStyle";
+import customStyles from "../Main/CustomStyle";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function CustomerFeedback() {
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const {
     reset,
@@ -35,13 +32,14 @@ export default function CustomerFeedback() {
 
   //Using react query to handle the API call POST
   const { mutate: logUser, isPending } = useMutation({
-    mutationFn: async (logUser) => AxiosFetch.post("/sendFeedback", { ...logUser }),
+    mutationFn: async (logUser) => AxiosFetch.post("/setupFeedback", { ...logUser }),
     onSuccess: (data) => {
       console.log(data);
+      //   navigate("/");
     },
     onError: (error) => {
       reset();
-
+      navigate("/");
       console.log(error);
 
       toast.error(
@@ -63,7 +61,6 @@ export default function CustomerFeedback() {
   });
 
   const onSubmit = (data) => {
-    console.log(data);
     if (!data.manager?.trim() || !data.email?.trim() || !data.location?.trim()) {
       toast.error(
         <div>
@@ -83,14 +80,10 @@ export default function CustomerFeedback() {
       return;
     }
 
-    // console.log("he click me");
-    // console.log(isSuccess);
-    // console.log(isError);
-
     const payload = {
       ...data,
     };
-    // console.log(payload);
+    console.log(payload);
 
     logUser(payload);
   };
@@ -98,8 +91,8 @@ export default function CustomerFeedback() {
   //GET LOCATION RECORD
   const {
     isLoading: LoadingLocation,
-    error,
     data,
+    // error,
   } = useQuery({
     queryKey: ["locationData"],
     retryOnMount: true, //do not retry on mount
@@ -119,25 +112,25 @@ export default function CustomerFeedback() {
 
   // console.log(data.AllOutletLocations);
 
-  if (error) {
-    toast.error(
-      <div>
-        <span>
-          {error.response ? error.response.data.msg : "Something went wrong contact Admin"}
-        </span>
-      </div>,
-      {
-        position: "top-center",
-        autoClose: 8000,
-        hideProgressBar: true,
-        closeOnClick: false,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        className: "toastBad",
-      },
-    );
-  }
+  //   if (error) {
+  //     toast.error(
+  //       <div>
+  //         <span>
+  //           {error.response ? error.response.data.msg : "Something went wrong contact Admin"}
+  //         </span>
+  //       </div>,
+  //       {
+  //         position: "top-center",
+  //         autoClose: 8000,
+  //         hideProgressBar: true,
+  //         closeOnClick: false,
+  //         pauseOnHover: true,
+  //         draggable: true,
+  //         progress: undefined,
+  //         className: "toastBad",
+  //       },
+  //     );
+  //   }
 
   const outletOptions =
     data?.AllOutletLocations?.map((OutletLocation) => ({
@@ -149,33 +142,27 @@ export default function CustomerFeedback() {
     <div>
       <div className="feedback-container">
         <div className="form-section">
-          <div className="card">
+          <div className="card_setup">
             {/* HEADER */}
             <div className="header">
               <img src={logo} alt="logo" className="logo" />
 
-              <div>
-                <h4>We value your feedback</h4>
+              <div className="header-text">
+                <h4>Feedback Setup Page</h4>
                 {/* <p className="subtitle">Help us improve your experience</p> */}
               </div>
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} autoComplete="off" noValidate>
-              {/* <StarRating label="Food Quality" rating={food} setRating={setFood} />
-
-              <StarRating label="Customer Service" rating={service} setRating={setService} />
-
-              <StarRating label="Ambiance" rating={ambiance} setRating={setAmbiance} /> */}
-
               {/* NAME */}
               <div className="form-group">
-                <label>Manager</label>
+                <label>Manager's Name</label>
                 <input
                   autoComplete="new-password"
                   {...register("manager", {
                     validate: (value) => (value && value.trim() !== "") || "Manager is required",
 
-                    required: "Manager is required",
+                    required: "Manager's name is required!",
                     minLength: {
                       value: 2,
                       message: "Minimum characters of 2 letters.",
@@ -189,53 +176,28 @@ export default function CustomerFeedback() {
                       message: "Alphabets and spaces only!",
                     },
                   })}
-                  placeholder="Enter your name"
+                  placeholder="Manager's name"
                 />
-                {errors.name && <span className="error">{errors.name.message}</span>}
+                {errors.manager && <span className="error">{errors.manager.message}</span>}
               </div>
-
-              {/* PHONE */}
               <div className="form-group">
-                <label>Phone Number</label>
-                <Controller
-                  name="phone"
-                  control={control}
-                  rules={{
-                    required: "Phone Number is required!",
-                    validate: (value) => {
-                      if (!value) return "Phone Number is required!";
-
-                      // Remove everything except digits
-                      let digits = value.replace(/\D/g, "");
-
-                      // Remove Nigeria country code if present
-                      if (digits.startsWith("234")) {
-                        digits = digits.slice(3);
-                      }
-                      // console.log(digits);
-                      // Now enforce strict 10–11 digits
-                      if (digits.length < 10 || digits.length > 10) {
-                        return "Not a valid Nigerian phone number!";
-                      }
-
-                      return true;
+                <label>Manager's Email</label>
+                <input
+                  autoComplete="new-password"
+                  type="email"
+                  //   name="email"
+                  placeholder="Manager's email address"
+                  formNoValidate
+                  {...register("email", {
+                    required: "Manager's Email address is required!",
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
+                      message: "Invalid email address!",
                     },
-                  }}
-                  render={({ field }) => (
-                    <PhoneInput
-                      {...field}
-                      defaultCountry="NG"
-                      // disableDropdown={true} // keeps 🇳🇬 but no dropdown
-                      international={false} // keeps local format
-                      placeholder="Enter your phone number"
-                      className="field"
-                      autoComplete="new-password"
-                    />
-                  )}
+                  })}
                 />
-                {errors.phone && <span className="error">{errors.phone.message}</span>}
+                {errors.email && <span className="error">{errors.email.message}</span>}
               </div>
-
               <div className="form-group">
                 <label>Outlet Locations</label>
                 <Controller
@@ -262,33 +224,13 @@ export default function CustomerFeedback() {
                 />
                 {errors.location && <span className="error">{errors.location.message}</span>}
               </div>
-              {/* COMMENT */}
-              <div className="form-group">
-                <label>Comments</label>
-                <textarea
-                  autoComplete="new-password"
-                  rows="4"
-                  maxLength={1000}
-                  {...register("comment", {
-                    validate: (value) =>
-                      (value && value.trim().length >= 10) || "Minimum 10 characters",
-                    required: "Comments required",
-                    minLength: {
-                      value: 10,
-                      message: "Response must be at least 10 characters",
-                    },
-                  })}
-                  placeholder="Tell us about your experience"
-                />
-                {errors.comment && <span className="error">{errors.comment.message}</span>}
-              </div>
 
               <button
                 disabled={isPending || isSubmitting}
                 type="submit"
                 className="submit-btn"
                 formNoValidate>
-                {isPending ? <Loading /> : "Submit Feedback"}
+                {isPending ? <Loading /> : "Submit Setup"}
               </button>
             </form>
           </div>

@@ -1,12 +1,21 @@
 import React from "react";
-import Index from "./Components/Index";
+import SetUp from "./Components/Setup/Index";
+import FeedbackForm from "./Components/Main/FeedbackForm";
+import ErrorPage from "./Components/Error/ErrorPage";
+import { ToastContainer } from "react-toastify";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-const App = () => {
+function App() {
   return (
-    <div>
-      <Index />
-    </div>
+    <Router>
+      <ToastContainer />
+      <Routes>
+        <Route path="/" element={<FeedbackForm />} />
+        <Route path="/feedbackSetup" element={<SetUp />} />
+        <Route path="*" element={<ErrorPage />} />
+      </Routes>
+    </Router>
   );
-};
+}
 
 export default App;
